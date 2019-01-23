@@ -8,31 +8,10 @@ settings =
     },
     iphone =
     {
+        xcassets="Images.xcassets",
         plist =
         {
             ITSAppUsesNonExemptEncryption=false,
-            --icon image files table
-            CFBundleIconFiles = {
-                "Icon-72.png",
-                "Icon-72@2x.png",
-                "Icon-Small-50.png",
-                "Icon-Small-50@2x.png",
-                "Icon-Small.png",
-                "Icon-Small@2x.png",
-                "Icon.png",
-                "Icon@2x.png",
-                "ios7_app_icon_ipad.png",
-                "ios7_app_icon_ipad@2x.png",
-                "ios7_app_icon_iphone.png",
-                "ios7_app_icon_iphone@2x.png",
-                "ios7_settings_icon.png",
-                "ios7_settings_icon@2x.png",
-                "ios7_spotlight_icon.png",
-                "ios7_spotlight_icon@2x.png",
-            },
-            --launch image files table (see section below)
-            UILaunchImages = {
-            },
         }
     }
 }
