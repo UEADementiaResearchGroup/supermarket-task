@@ -1,5 +1,12 @@
 settings =
 {
+    plugins =
+    {
+        ["plugin.zip"] =
+        {
+            publisherId = "com.coronalabs"
+        },
+    },
     orientation =
     {
         content="landscapeRight",
@@ -12,6 +19,10 @@ settings =
         plist =
         {
             ITSAppUsesNonExemptEncryption=false,
+            UIStatusBarHidden = true,
+            UILaunchStoryboardName = "LaunchScreen",
+            UIApplicationExitsOnSuspend = true,
+            UIFileSharingEnabled = true,
         }
     }
 }

@@ -1,0 +1,17 @@
+{
+  "practice.mp4":{"quadrant":4,"direction":"N"},
+  "S1Trial01_HQ_1.mp4":{"quadrant":4,"direction":"W"},
+  "S1Trial02_HQ.mp4":{"quadrant":3,"direction":"E"},
+  "S1Trial03_HQ.mp4":{"quadrant":1,"direction":"W"},
+  "S1Trial04_HQ.mp4":{"quadrant":2,"direction":"S"},
+  "S1Trial05_HQ.mp4":{"quadrant":2,"direction":"E"},
+  "S1Trial06_HQ.mp4":{"quadrant":3,"direction":"E"},
+  "S1Trial07_HQ.mp4":{"quadrant":1,"direction":"W"},
+  "S2Trial01_HQ.mp4":{"quadrant":1,"direction":"W"},
+  "S2Trial02_HQ.mp4":{"quadrant":3,"direction":"E"},
+  "S2Trial03_HQ.mp4":{"quadrant":4,"direction":"N"},
+  "S2Trial04_HQ.mp4":{"quadrant":2,"direction":"S"},
+  "S2Trial05_HQ.mp4":{"quadrant":1,"direction":"W"},
+  "S2Trial06_HQ.mp4":{"quadrant":3,"direction":"E"},
+  "S2Trial07_HQ.mp4":{"quadrant":2,"direction":"S"}
+}
