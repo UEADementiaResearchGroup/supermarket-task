@@ -135,14 +135,19 @@ function scene:show(event)
         t1:setFillColor(1,0,0)
         feedbackRect:setFillColor(1,0,0,0.5)
       end
-      bg:removeEventListener('tap',tap)
+      -- bg:removeEventListener('tap',tap)
     end
 
     local angle=math.atan2(dy, dx)+math.pi/2
-    man.rotation=math.deg(angle)
-    data["egocentric direction x"]=event.x
-    data["egocentric direction y"]=event.y
-    data["egocentric angle"]=man.rotation
+    local deg = math.deg(angle) % 360
+    if deg < 0 then
+      deg = deg + 360
+    end
+
+    man.rotation=deg
+    data["egocentric direction x"]=dx * 100 / display.contentWidth
+    data["egocentric direction y"]=dy * 100 / display.contentHeight
+    data["egocentric angle"]=deg
     data["egocentric attempts"]=(data["egocentric attempts"] or 0) + 1
     data["egocentric response time"]=data["egocentric response time"] or delay
     data["egocentric final response time"]=delay
