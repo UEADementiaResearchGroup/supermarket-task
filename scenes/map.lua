@@ -23,7 +23,7 @@ function scene:show(event)
   end
 
   local id=users.getID()
-  local path=users.getDirectory(id).."/data.csv"
+  local path=users.getDirectory(id)..("/supermarket_%s.csv"):format(id)
   local writeLine=csv.create(path,{
     "Participant ID",
     "date",
