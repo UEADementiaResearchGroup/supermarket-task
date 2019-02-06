@@ -257,12 +257,16 @@ function scene:show(event)
     data["map height"]=map.contentHeight
     data["map selection response time"]=data["map selection response time"] or (system.getTimer()-time)
     data["map selection final response time"]=system.getTimer()-time
-    data["map location x"]=event.x-map.x
-    data["map location y"]=event.y-map.y
+    data["map location x"]=(event.x-map.x) * 100 / display.contentWidth
+    data["map location y"]=(event.y-map.y) * 100 / display.contentHeight
     data["map selection attempts"]=(data["map selection attempts"] or 0) +1
     data["map location correct x"],data["map location correct y"]=correctSpot:localToContent(0, 0)
     data["map location correct x"]=data["map location correct x"]-map.x
     data["map location correct y"]=data["map location correct y"]-map.y
+
+    data["map location correct x"]=data["map location correct x"] * 100 / display.contentWidth
+    data["map location correct y"]=data["map location correct y"] * 100 / display.contentWidth
+
     buttonLabel.isVisible=true
     button.isVisible=true
     return true
