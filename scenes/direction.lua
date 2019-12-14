@@ -11,6 +11,7 @@ local graphics=graphics
 local os=os
 local system=system
 local math=math
+local timer = timer
 
 setfenv(1,scene)
 
@@ -23,8 +24,7 @@ function scene:show(event)
 
   local group=display.newGroup()
   self.view:insert(group)
-  local man=display.newImage(group,'img/man.png')
-  man:translate(display.contentCenterX,display.contentCenterY)
+
 
   local t1=display.newText({
     parent=group,
@@ -58,24 +58,64 @@ function scene:show(event)
   buttonLabel.isVisible=false
   button.isVisible=false
 
+  local height = button.contentBounds.yMin - t1.contentBounds.yMax
+
+  local man=display.newImage(group,'img/man.png')
+  man:translate(display.contentCenterX, (t1.contentBounds.yMax + button.contentBounds.yMin)/2)
+
+  local r = height * 5/6 / 2
+  local dots = 100
+  for i = 1, dots do
+    local t = i/dots * math.pi * 2
+    local x = math.cos(t) * r + display.contentCenterX
+    local y = math.sin(t) * r + man.y
+    display.newCircle(group, x, y, 10)
+  end
+
   local labels={
-    {x=display.contentWidth*0.25,y=display.contentCenterY,label="Left"},
-    {x=display.contentWidth*0.75,y=display.contentCenterY,label="Right"},
-    {x=display.contentCenterX,y=display.contentHeight*0.25,label="Forwards"},
-    {x=display.contentCenterX,y=display.contentHeight*0.75,label="Backwards"},
+    {
+      x=display.contentCenterX - r - 20,
+      y=man.y,
+      align = "right",
+      anchorX = 1,
+      label="Left"
+    },
+    {
+      x=display.contentCenterX + r + 20,
+      y=man.y,
+      align = "left",
+      anchorX = 0,
+      label="Right"
+    },
+    {
+      x=display.contentCenterX,
+      y=man.y - r - 20,
+      align = "center",
+      anchorY = 1,
+      label="Forwards"
+    },
+    {
+      x=display.contentCenterX,
+      y=man.y + r + 20,
+      align = "center",
+      anchorY = 0,
+      label="Backwards"
+    },
   }
 
   for i=1,#labels do
     local lab=labels[i]
 
-    display.newText({
+    local text = display.newText({
       parent=group,
       text=lab.label,
       x=lab.x,
       y=lab.y,
-      fontSize=70,
-      align='center',
+      fontSize=50,
+      align=lab.align,
     })
+    text.anchorX = lab.anchorX or 0.5
+    text.anchorY = lab.anchorY or 0.5
   end
 
   local bg=display.newRect(
@@ -91,19 +131,30 @@ function scene:show(event)
   local data={}
   data.video=event.params.video
 
-
-  button:addEventListener("tap", function()
-    bg:removeSelf()
-    composer.gotoScene("scenes.map",{
-      params={
-        data=data
-      }
-    })
-    return true
-  end)
-
   local feedback=event.params.enableFeedback
+  local deg, angle, dx, dy
+
+  local bgTap = function(event)
+    dx=event.x-display.contentCenterX
+    dy=event.y-man.y
+
+    angle=math.atan2(dy, dx)+math.pi/2
+    deg = math.deg(angle) % 360
+    if deg < 0 then
+      deg = deg + 360
+    end
+
+    man.rotation=deg
+    buttonLabel.isVisible=true
+    button.isVisible=true
+
+  end
+  bg:addEventListener('tap', bgTap)
+
   tap=function(event)
+    bg:removeEventListener('tap', bgTap)
+    button:removeEventListener('tap', tap)
+
     local delay=event.time-time
     if data["direction response time"] then
       local dt=delay-data["direction response time"]
@@ -111,40 +162,7 @@ function scene:show(event)
         return
       end
     end
-    local dx=event.x-display.contentCenterX
-    local dy=event.y-display.contentCenterY
 
-    if feedback then
-      feedback=false
-      local feedbackRect=display.newRect(
-        group,
-        display.contentWidth*(dx<0 and 0.25 or 0.75),
-        display.contentHeight*(dy<0 and 0.25 or 0.75),
-        display.contentCenterX,
-        display.contentCenterY)
-      feedbackRect:toBack()
-      bg:toBack()
-      if dx<0 and dy>0 then
-        composer.setVariable('lastDirectionFeedback',true)
-        t1.text="Correct"
-        t1:setFillColor(0,1,0)
-        feedbackRect:setFillColor(0,1,0,0.5)
-      else
-        composer.setVariable('lastDirectionFeedback',false)
-        t1.text="Wrong"
-        t1:setFillColor(1,0,0)
-        feedbackRect:setFillColor(1,0,0,0.5)
-      end
-      -- bg:removeEventListener('tap',tap)
-    end
-
-    local angle=math.atan2(dy, dx)+math.pi/2
-    local deg = math.deg(angle) % 360
-    if deg < 0 then
-      deg = deg + 360
-    end
-
-    man.rotation=deg
     data["egocentric direction x"]=dx * 100 / display.contentWidth
     data["egocentric direction y"]=dy * 100 / display.contentHeight
     data["egocentric angle"]=deg
@@ -168,11 +186,76 @@ function scene:show(event)
       end
     end
     data["egocentric quadrant reponse"]=quadrant
-    buttonLabel.isVisible=true
-    button.isVisible=true
+
+    if feedback then
+      feedback=false
+      button.isVisible = false
+      buttonLabel.isVisible = false
+      timer.performWithDelay(1000, function()
+        button.isVisible =true
+        buttonLabel.isVisible =true
+      end)
+      local feedbackRect=display.newRect(
+        group,
+        display.contentWidth*(dx<0 and 0.25 or 0.75),
+        display.contentHeight*(dy<0 and 0.25 or 0.75),
+        display.contentCenterX,
+        display.contentCenterY)
+      feedbackRect:toBack()
+      t1.x = feedbackRect.x
+      t1.y = feedbackRect.y
+      if dx<0 and dy>0 then
+        composer.setVariable('lastDirectionFeedback',true)
+        t1.text="Correct"
+        t1:setFillColor(0,1,0)
+        feedbackRect:setFillColor(0,1,0,0.5)
+      else
+        composer.setVariable('lastDirectionFeedback',false)
+        t1.text="Wrong"
+        t1:setFillColor(1,0,0)
+        feedbackRect:setFillColor(1,0,0,0.5)
+        local correctRect=display.newRect(
+          group,
+          display.contentWidth*(0.25),
+          display.contentHeight*(0.75),
+          display.contentCenterX,
+          display.contentCenterY)
+        correctRect:setFillColor(1, 1, 0, 0.5)
+        correctRect:toBack()
+
+        display.newText({
+          parent=group,
+          text="The correct direction",
+          x=correctRect.x,
+          y=correctRect.y,
+          fontSize=70,
+          align='center',
+          width=display.contentWidth-40
+        }):setFillColor(1,1,0)
+      end
+      -- bg:removeEventListener('tap',tap)
+      button:addEventListener("tap", function()
+        bg:removeSelf()
+        composer.gotoScene("scenes.map",{
+          params={
+            data=data
+          }
+        })
+        return true
+      end)
+    else
+      bg:removeSelf()
+      composer.gotoScene("scenes.map",{
+        params={
+          data=data
+        }
+      })
+    end
+    bg:toBack()
+
     return true
   end
-  bg:addEventListener('tap', tap)
+  button:addEventListener("tap", tap)
 end
 scene:addEventListener("show")
 
